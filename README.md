@@ -1,5 +1,5 @@
 # request-info-docker
-Simple docker web app to output Request Headers
+Simple docker web app to output Request path, parameters and headers. It's useful if you want to see how application sees requests from behind proxy/load balancer. 
 
 <b>Run example:</b>
 
