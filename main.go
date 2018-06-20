@@ -1,49 +1,53 @@
 package main
 
 import (
-    "fmt"
-    "net/http"
-    "sort"
+	"fmt"
+	"net/http"
+	"os"
+	"sort"
 )
 
 func handler(w http.ResponseWriter, r *http.Request) {
-    fmt.Fprintln(w, "<html><body>");
 
-    fmt.Fprintln(w, "<i>Request Host</i>: ", r.Host, "</br>")
-    fmt.Fprintln(w, "<i>Request URL</i>: ", r.URL, "</br>")
-    fmt.Fprintln(w, "<i>Context path</i>: ", r.URL.Path[1:], "</br>")
-    fmt.Fprintln(w, "<i>Client IP (RemoteAddr)</i>: ", r.RemoteAddr, "</br>")
-    fmt.Fprintln(w, "<i>Request TLS</i>: ", r.TLS, "</br>")
+	fmt.Println("Request Host: ", r.Host)
+	fmt.Println("Request URL: ", r.URL)
+	fmt.Println("Context path: ", r.URL.Path[1:])
+	fmt.Println("Client IP (RemoteAddr): ", r.RemoteAddr)
+	fmt.Println("Request TLS: ", r.TLS)
 
-    fmt.Fprintln(w, "</br><b>Request Headers:</b></br>")
-    var keys []string
-    for k := range r.Header {
-        keys = append(keys, k)
-    }
-    sort.Strings(keys)
-    fmt.Fprintln(w, "<ul>")
-    for _, k := range keys {
-        fmt.Fprintln(w, "<li><i>", k, "</i>:", r.Header[k], "</li>")
-    }
-    fmt.Fprintln(w, "</ul>")
+	fmt.Println("Request Headers:")
+	var keys []string
+	for k := range r.Header {
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
+	for _, k := range keys {
+		fmt.Println("\t", k, ": ", r.Header[k])
+	}
 
-    fmt.Fprintln(w, "</br><b>Form parameters:</b></br>")
-    r.ParseForm()
-    keys = []string{}
-    for k := range r.Form {
-        keys = append(keys, k)
-    }
-    sort.Strings(keys)
-    fmt.Fprintln(w, "<ul>")
-    for _, k := range keys {
-        fmt.Fprintln(w, "<li><i>", k, "</i>:", r.Form[k], "</li>")
-    }
-    fmt.Fprintln(w, "</ul>")
+	fmt.Println("Form parameters:")
+	r.ParseForm()
+	keys = []string{}
+	for k := range r.Form {
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
+	for _, k := range keys {
+		fmt.Println("\t", k, ":", r.Form[k])
+	}
+	fmt.Println("")
 
-    fmt.Fprintln(w, "</body></html>");
+	w.WriteHeader(http.StatusOK)
 }
 
 func main() {
-    http.HandleFunc("/", handler)
-    http.ListenAndServe(":8080", nil)
+	http.HandleFunc("/", handler)
+
+	port := os.Getenv("PORT")
+
+	if port == "" {
+		port = "8080"
+	}
+
+	http.ListenAndServe(":"+port, nil)
 }
